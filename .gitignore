@@ -228,5 +228,5 @@ sqlite.db
 # pytest
 .pytest_cache
 
-#
+# migrations
 *versions/
