@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "litestar-user-probe"
+version = "0.1.0"
+description = "Test task to know about litestar и advanced-alchemy"
+authors = ["Artemis"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+advanced-alchemy = "^1.4.1"
+python-dotenv = "^1.1.0"
+litestar-granian = "^0.12.2"
+msgspec = "^0.19.0"
+pydantic = "^2.11.4"
+litestar = {extras = ["pydantic"], version = "^2.16.0"}
+asyncpg = "^0.30.0"
+
+[tool.poetry.plugins."litestar.commands"]
+my_command = "my_litestar_plugin.cli:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
