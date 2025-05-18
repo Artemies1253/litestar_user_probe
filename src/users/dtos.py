@@ -15,8 +15,10 @@ class User(BaseModel):
 
 
 class CreateUser(BaseModel):
+    login: str
     first_name: str
     last_name: str
+    password: str
 
 
 class UserWithoutPasswordDTO(PydanticDTO[User]):
