@@ -1,36 +1,47 @@
-from advanced_alchemy.filters import SearchFilter, CollectionFilter, StatementFilter
-from typing_extensions import Annotated
 
-from advanced_alchemy.extensions.litestar.providers import FilterConfig
+from base.settings import BASE_PAGE_LIMIT
+from base.validators import is_ids_valid
 from litestar import Controller, get, post
-from litestar.params import Dependency
 from advanced_alchemy.extensions.litestar import providers
-from advanced_alchemy import filters, service
+from advanced_alchemy import service
+from litestar.exceptions import HTTPException
+from litestar.params import Parameter
+from litestar.status_codes import HTTP_400_BAD_REQUEST
+from pydantic import ValidationError
 
 from src.users.dtos import UserWithoutPasswordDTO, User, CreateUser
+from typing_extensions import Annotated
+from users.filters import UserListFilter
 from users.repositories import UserRepositoryService
-from users.services import create_user, get_user
+from users.services import create_user, get_user, get_user_list
 
 
 class UserController(Controller):
     path = "/users"
     return_dto = UserWithoutPasswordDTO
 
-    dependencies = providers.create_service_dependencies(
-        UserRepositoryService,
-        "user_service",
-        filters=FilterConfig(pagination_type="limit_offset", search="first_name,login")
-    )
+    dependencies = providers.create_service_dependencies(UserRepositoryService, "user_service", )
 
     @get("/")
     async def get_user_list(
             self,
             user_service: UserRepositoryService,
-            filters: Annotated[list[StatementFilter], Dependency(skip_validation=True)],
-            login: str | None = None, first_name: str | None = None,
+            login_like: str | None = None, first_name_equal: str | None = None,
+            limit: int = BASE_PAGE_LIMIT, offset: int = 0,
+            ids: Annotated[str, Parameter(description="список id", pattern=r'^[0-9, ]*$')] | None = None,
     ) -> service.OffsetPagination[User]:
-        results, total = await user_service.list_and_count(*filters)
-        return user_service.to_schema(results, total, filters=filters, schema_type=User)
+        try:
+            if ids and is_ids_valid(ids):
+                ids = list(map(int, map(str.strip, ids.split(","))))
+            else:
+                ids = []
+            user_filter = UserListFilter(
+                login_like=login_like, first_name_equal=first_name_equal, ids=ids, limit=limit, offset=offset
+            )
+
+            return await get_user_list(user_filters=user_filter, user_service=user_service)
+        except ValidationError:
+            raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="bad request")
 
     @post("/")
     async def create_user(self, user_service: UserRepositoryService, data: CreateUser) -> User:

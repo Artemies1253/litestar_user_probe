@@ -19,3 +19,5 @@ POSTGRES_DB = os.environ.get("POSTGRES_DB", "db")
 SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@" \
                           f"{POSTGRES_DB}/{POSTGRES_DB_NAME}"
 ALLOW_ORIGINS = os.environ.get("ALLOW_ORIGINS").split(",")
+
+BASE_PAGE_LIMIT = 20

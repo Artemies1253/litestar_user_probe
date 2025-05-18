@@ -2,4 +2,9 @@ from pydantic import BaseModel
 
 
 class UserListFilter(BaseModel):
-    pass
+    login_like: str | None = None
+    first_name_equal: str | None = None
+    ids: list | None = None
+
+    limit: int = 20
+    offset: int = 0
