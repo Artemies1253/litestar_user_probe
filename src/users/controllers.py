@@ -1,19 +1,19 @@
-
 from base.settings import BASE_PAGE_LIMIT
 from base.validators import is_ids_valid
-from litestar import Controller, get, post
+from litestar import Controller, get, post, put
 from advanced_alchemy.extensions.litestar import providers
 from advanced_alchemy import service
 from litestar.exceptions import HTTPException
 from litestar.params import Parameter
 from litestar.status_codes import HTTP_400_BAD_REQUEST
+from litestar.dto import DTOData
 from pydantic import ValidationError
 
-from src.users.dtos import UserWithoutPasswordDTO, User, CreateUser
+from src.users.dtos import UserWithoutPasswordDTO, User, CreateUser, CreateUserDTO, UpdateUser, UpdateUserDTO
 from typing_extensions import Annotated
 from users.filters import UserListFilter
 from users.repositories import UserRepositoryService
-from users.services import create_user, get_user, get_user_list
+from users.services import create_user, get_user, get_user_list, update_user
 
 
 class UserController(Controller):
@@ -43,10 +43,15 @@ class UserController(Controller):
         except ValidationError:
             raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="bad request")
 
-    @post("/")
+    @post("/", dto=CreateUserDTO)
     async def create_user(self, user_service: UserRepositoryService, data: CreateUser) -> User:
         return await create_user(user_service=user_service, user_create_data=data)
 
     @get("/{id:int}")
     async def get_user(self, id: int, user_service: UserRepositoryService) -> User:
         return await get_user(user_id=id, user_service=user_service)
+
+    @put("/{id:int}", dto=UpdateUserDTO)
+    async def update_user(self, id: int, user_service: UserRepositoryService, data: UpdateUser) -> User:
+        return await update_user(user_id=id, user_service=user_service, user_data=data)
+

@@ -5,7 +5,7 @@ from advanced_alchemy.exceptions import DuplicateKeyError, NotFoundError
 from litestar.exceptions import HTTPException
 from litestar.status_codes import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 
-from users.dtos import CreateUser, User
+from users.dtos import CreateUser, User, UpdateUser
 from users.filters import UserListFilter
 from users.repositories import UserRepositoryService
 
@@ -37,6 +37,17 @@ async def get_user(user_id: int, user_service: UserRepositoryService) -> User:
         user = await user_service.get(item_id=user_id)
     except NotFoundError:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found")
+
+    return user_service.to_schema(user, schema_type=User)
+
+
+async def update_user(user_id: int, user_service: UserRepositoryService, user_data: UpdateUser) -> User:
+    try:
+        user = await user_service.update(user_data, item_id=user_id, auto_commit=True)
+    except NotFoundError:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found")
+    except DuplicateKeyError:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="login is already exist")
 
     return user_service.to_schema(user, schema_type=User)
 

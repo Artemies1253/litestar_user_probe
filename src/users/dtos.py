@@ -21,5 +21,15 @@ class CreateUser(BaseModel):
     password: str
 
 
+class UpdateUser(BaseModel):
+    login: str
+    first_name: str
+    last_name: str
+
+
+CreateUserDTO = PydanticDTO[CreateUser]
+UpdateUserDTO = PydanticDTO[UpdateUser]
+
+
 class UserWithoutPasswordDTO(PydanticDTO[User]):
     config = DTOConfig(exclude={"password"}, partial=True)
