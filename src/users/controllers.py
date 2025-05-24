@@ -1,6 +1,6 @@
 from base.settings import BASE_PAGE_LIMIT
 from base.validators import is_ids_valid
-from litestar import Controller, get, post, put
+from litestar import Controller, get, post, put, delete
 from advanced_alchemy.extensions.litestar import providers
 from advanced_alchemy import service
 from litestar.exceptions import HTTPException
@@ -13,10 +13,11 @@ from src.users.dtos import UserWithoutPasswordDTO, User, CreateUser, CreateUserD
 from typing_extensions import Annotated
 from users.filters import UserListFilter
 from users.repositories import UserRepositoryService
-from users.services import create_user, get_user, get_user_list, update_user
+from users.services import create_user, get_user, get_user_list, update_user, delete_user
 
 
 class UserController(Controller):
+    tags = ["User"]
     path = "/users"
     return_dto = UserWithoutPasswordDTO
 
@@ -55,3 +56,6 @@ class UserController(Controller):
     async def update_user(self, id: int, user_service: UserRepositoryService, data: UpdateUser) -> User:
         return await update_user(user_id=id, user_service=user_service, user_data=data)
 
+    @delete("/{id:int}")
+    async def delete_user(self, id: int, user_service: UserRepositoryService) -> None:
+        await delete_user(user_id=id, user_service=user_service)

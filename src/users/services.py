@@ -52,6 +52,13 @@ async def update_user(user_id: int, user_service: UserRepositoryService, user_da
     return user_service.to_schema(user, schema_type=User)
 
 
+async def delete_user(user_id: int, user_service: UserRepositoryService) -> None:
+    try:
+        await user_service.delete(item_id=user_id, auto_commit=True)
+    except NotFoundError:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found")
+
+
 def get_alchemy_user_filters(user_filters: UserListFilter) -> list[LimitOffset, list[SearchFilter]]:
     filters = []
     pagination = LimitOffset(limit=user_filters.limit, offset=user_filters.offset)
