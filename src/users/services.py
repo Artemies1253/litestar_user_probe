@@ -10,13 +10,13 @@ from users.filters import UserListFilter
 from users.repositories import UserRepositoryService
 
 
-def verify_password(plain_password, hashed_password):
+def verify_password(plain_password: str, hashed_password: str):
     """Проверка соответствия пароля и хеша"""
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password):
+def get_password_hash(password: str):
     """Дать захешированную версию пароля"""
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     return pwd_context.hash(password)
@@ -59,7 +59,7 @@ async def delete_user(user_id: int, user_service: UserRepositoryService) -> None
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found")
 
 
-def get_alchemy_user_filters(user_filters: UserListFilter) -> list[LimitOffset, list[SearchFilter]]:
+def get_alchemy_user_list_filters(user_filters: UserListFilter) -> list[LimitOffset, list[SearchFilter]]:
     filters = []
     pagination = LimitOffset(limit=user_filters.limit, offset=user_filters.offset)
     filters.append(pagination)
@@ -82,6 +82,6 @@ def get_alchemy_user_filters(user_filters: UserListFilter) -> list[LimitOffset, 
 async def get_user_list(
         user_filters: UserListFilter, user_service: UserRepositoryService
 ) -> service.OffsetPagination[User]:
-    filters = get_alchemy_user_filters(user_filters=user_filters)
+    filters = get_alchemy_user_list_filters(user_filters=user_filters)
     results, total = await user_service.list_and_count(*filters)
     return user_service.to_schema(results, total, filters=filters, schema_type=User)

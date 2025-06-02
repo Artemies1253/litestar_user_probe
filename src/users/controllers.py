@@ -1,12 +1,11 @@
 from base.settings import BASE_PAGE_LIMIT
 from base.validators import is_ids_valid
-from litestar import Controller, get, post, put, delete
+from litestar import Controller, get, post, put, delete, Request
 from advanced_alchemy.extensions.litestar import providers
 from advanced_alchemy import service
 from litestar.exceptions import HTTPException
 from litestar.params import Parameter
 from litestar.status_codes import HTTP_400_BAD_REQUEST
-from litestar.dto import DTOData
 from pydantic import ValidationError
 
 from src.users.dtos import UserWithoutPasswordDTO, User, CreateUser, CreateUserDTO, UpdateUser, UpdateUserDTO
@@ -26,6 +25,7 @@ class UserController(Controller):
     @get("/")
     async def get_user_list(
             self,
+            request: Request,
             user_service: UserRepositoryService,
             login_like: str | None = None, first_name_equal: str | None = None,
             limit: int = BASE_PAGE_LIMIT, offset: int = 0,
