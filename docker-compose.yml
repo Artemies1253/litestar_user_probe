@@ -11,15 +11,6 @@ services:
       - db:/var/lib/postgresql/data
       - ./postgres.conf:/etc/postgresql.conf
     command: 'postgres -c config_file="/etc/postgresql.conf"'
-#  test_db:
-#    image: postgres:latest
-#    restart: always
-#    env_file:
-#      - .env
-#    volumes:
-#      - test_db:/var/lib/postgresql/test_data
-#      - ./postgres.conf:/etc/postgresql.conf
-#    command: 'postgres -c config_file="/etc/postgresql.conf"'
 #  web:
 #    build:
 #      context: .

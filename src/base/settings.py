@@ -11,6 +11,8 @@ if os.path.exists(dotenv_path):
 
 DEBUG = bool(os.environ.get("DEBUG", False))
 
+SECRET_KEY = os.environ.get("SECRET_KEY")
+
 # db
 POSTGRES_USER = os.environ.get("POSTGRES_USER")
 POSTGRES_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
