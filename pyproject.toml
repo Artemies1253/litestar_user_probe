@@ -17,9 +17,6 @@ asyncpg = "^0.30.0"
 passlib = "^1.7.4"
 bcrypt = "4.0.1"
 
-[tool.poetry.plugins."litestar.commands"]
-my_command = "my_litestar_plugin.cli:main"
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
