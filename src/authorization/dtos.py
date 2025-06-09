@@ -1,7 +1,4 @@
-from datetime import datetime
-
-from pydantic import BaseModel, Field
-from litestar.dto import DTOConfig
+from pydantic import BaseModel
 from litestar.plugins.pydantic import PydanticDTO
 
 

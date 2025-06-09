@@ -15,7 +15,7 @@ sqlalchemy_config = SQLAlchemyAsyncConfig(
     session_config=AsyncSessionConfig(expire_on_commit=False),
     create_all=True,
     alembic_config=AlembicAsyncConfig(
-        script_location="./migrations/",
+        script_location="./migrations/"
     ),
 
 )

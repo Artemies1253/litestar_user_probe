@@ -18,3 +18,4 @@ class UserModel(BigIntBase):
         server_default=func.now()
     )
     password: Mapped[str]
+    is_supper_user: Mapped[bool] = mapped_column(default=False)

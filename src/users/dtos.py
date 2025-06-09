@@ -12,6 +12,7 @@ class User(BaseModel):
     last_name: str
     created_date: datetime = Field(default_factory=datetime.now)
     password: str
+    is_supper_user: bool
 
 
 class CreateUser(BaseModel):
