@@ -5,7 +5,7 @@ from advanced_alchemy.extensions.litestar import providers
 from advanced_alchemy import service
 from litestar.exceptions import HTTPException
 from litestar.params import Parameter
-from litestar.status_codes import HTTP_400_BAD_REQUEST
+from litestar.status_codes import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from pydantic import ValidationError
 
 from src.users.dtos import UserWithoutPasswordDTO, User, CreateUser, CreateUserDTO, UpdateUser, UpdateUserDTO
@@ -25,7 +25,6 @@ class UserController(Controller):
     @get("/")
     async def get_user_list(
             self,
-            request: Request,
             user_service: UserRepositoryService,
             login_like: str | None = None, first_name_equal: str | None = None,
             limit: int = BASE_PAGE_LIMIT, offset: int = 0,
@@ -45,17 +44,28 @@ class UserController(Controller):
             raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="bad request")
 
     @post("/", dto=CreateUserDTO)
-    async def create_user(self, user_service: UserRepositoryService, data: CreateUser) -> User:
-        return await create_user(user_service=user_service, user_create_data=data)
+    async def create_user(self, request: Request, user_service: UserRepositoryService, data: CreateUser) -> User:
+        if request.user.is_supper_user:
+            return await create_user(user_service=user_service, user_create_data=data)
+        else:
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="forbidden")
 
     @get("/{id:int}")
     async def get_user(self, id: int, user_service: UserRepositoryService) -> User:
         return await get_user(user_id=id, user_service=user_service)
 
     @put("/{id:int}", dto=UpdateUserDTO)
-    async def update_user(self, id: int, user_service: UserRepositoryService, data: UpdateUser) -> User:
-        return await update_user(user_id=id, user_service=user_service, user_data=data)
+    async def update_user(
+            self, request: Request, id: int, user_service: UserRepositoryService, data: UpdateUser
+    ) -> User:
+        if request.user.is_supper_user or request.user.id == id:
+            return await update_user(user_id=id, user_service=user_service, user_data=data)
+        else:
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="forbidden")
 
     @delete("/{id:int}")
-    async def delete_user(self, id: int, user_service: UserRepositoryService) -> None:
-        await delete_user(user_id=id, user_service=user_service)
+    async def delete_user(self, request: Request, id: int, user_service: UserRepositoryService) -> None:
+        if request.user.is_supper_user or request.user.id == id:
+            await delete_user(user_id=id, user_service=user_service)
+        else:
+            raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="forbidden")
