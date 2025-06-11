@@ -11,18 +11,18 @@ services:
       - db:/var/lib/postgresql/data
       - ./postgres.conf:/etc/postgresql.conf
     command: 'postgres -c config_file="/etc/postgresql.conf"'
-#  web:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    command: uvicorn main:app --workers ${WORKER_COUNT} --host 0.0.0.0 --port ${WEB_SERVER_PORT}
-#    restart: always
-#    ports:
-#      - ${WEB_SERVER_PORT}:${WEB_SERVER_PORT}
-#    env_file:
-#      - .env
-#    volumes:
-#      - ./src/:/src/
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: granian --interface asgi main:app --workers ${WORKER_COUNT} --host 0.0.0.0 --port ${WEB_SERVER_PORT}
+    restart: always
+    ports:
+      - ${WEB_SERVER_PORT}:${WEB_SERVER_PORT}
+    env_file:
+      - .env
+    volumes:
+      - ./src/:/src/
 
 volumes:
   db:
