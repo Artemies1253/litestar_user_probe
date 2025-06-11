@@ -4,12 +4,12 @@ from dotenv import load_dotenv
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-dotenv_path = os.path.join(BASE_DIR, '.env')
+dotenv_path = os.path.join(BASE_DIR, ".env")
 
 if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path)
 
-DEBUG = bool(os.environ.get("DEBUG", False))
+DEBUG = bool(os.environ.get("DEBUG", "0"))
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 

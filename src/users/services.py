@@ -10,13 +10,13 @@ from users.filters import UserListFilter
 from users.repositories import UserRepositoryService
 
 
-def verify_password(plain_password: str, hashed_password: str):
+def verify_password(plain_password: str, hashed_password: str) -> str:
     """Проверка соответствия пароля и хеша"""
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def get_password_hash(password: str):
+def get_password_hash(password: str) -> str:
     """Дать захешированную версию пароля"""
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     return pwd_context.hash(password)
@@ -26,8 +26,8 @@ async def create_user(user_service: UserRepositoryService, user_create_data: Cre
     user_create_data.password = get_password_hash(user_create_data.password)
     try:
         user = await user_service.create(user_create_data)
-    except DuplicateKeyError:
-        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="login is already exist")
+    except DuplicateKeyError as ex:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="login is already exist") from ex
 
     return user_service.to_schema(user, schema_type=User)
 
@@ -35,8 +35,8 @@ async def create_user(user_service: UserRepositoryService, user_create_data: Cre
 async def get_user(user_id: int, user_service: UserRepositoryService) -> User:
     try:
         user = await user_service.get(item_id=user_id)
-    except NotFoundError:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found")
+    except NotFoundError as ex:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found") from ex
 
     return user_service.to_schema(user, schema_type=User)
 
@@ -44,10 +44,10 @@ async def get_user(user_id: int, user_service: UserRepositoryService) -> User:
 async def update_user(user_id: int, user_service: UserRepositoryService, user_data: UpdateUser) -> User:
     try:
         user = await user_service.update(user_data, item_id=user_id, auto_commit=True)
-    except NotFoundError:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found")
-    except DuplicateKeyError:
-        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="login is already exist")
+    except NotFoundError as ex:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found") from ex
+    except DuplicateKeyError as ex:
+        raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="login is already exist") from ex
 
     return user_service.to_schema(user, schema_type=User)
 
@@ -55,8 +55,8 @@ async def update_user(user_id: int, user_service: UserRepositoryService, user_da
 async def delete_user(user_id: int, user_service: UserRepositoryService) -> None:
     try:
         await user_service.delete(item_id=user_id, auto_commit=True)
-    except NotFoundError:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found")
+    except NotFoundError as ex:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found") from ex
 
 
 def get_alchemy_user_list_filters(user_filters: UserListFilter) -> list[LimitOffset, list[SearchFilter]]:

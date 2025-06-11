@@ -26,15 +26,15 @@ class ApplicationCore(CLIPluginProtocol):
 
     def on_cli_init(self, cli: Group) -> None:
 
-        @cli.command('check-db-status')
+        @cli.command("check-db-status")
         def check_db_status() -> None:
             import anyio
             async def _check_db_status() -> None:
                 async with sqlalchemy_config.get_session() as db_session:
                     a_value = await db_session.execute(text("SELECT 1"))
                     if a_value.scalar_one() == 1:
-                        print("Database is healthy")
+                        print("Database is healthy")  # noqa: T201
                     else:
-                        print("Database is not healthy")
+                        print("Database is not healthy")  # noqa: T201
 
             anyio.run(_check_db_status)
