@@ -2,7 +2,7 @@ import asyncio
 from typing import TYPE_CHECKING, cast
 
 from sqlalchemy import pool
-from sqlalchemy.ext.asyncio import AsyncEngine, async_engine_from_config
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from advanced_alchemy.base import metadata_registry
 from alembic import context

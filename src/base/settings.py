@@ -21,6 +21,13 @@ POSTGRES_DB = os.environ.get("POSTGRES_DB", "db")
 SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@" \
                           f"{POSTGRES_DB}/{POSTGRES_DB_NAME}"
 
+TEST_POSTGRES_USER = os.environ.get("TEST_POSTGRES_USER")
+TEST_POSTGRES_PASSWORD = os.environ.get("TEST_POSTGRES_PASSWORD")
+TEST_POSTGRES_DB_NAME = os.environ.get("TEST_POSTGRES_DB_NAME")
+TEST_POSTGRES_DB = os.environ.get("TEST_POSTGRES_DB", "db")
+TEST_SQLALCHEMY_DATABASE_URL = f"postgresql+asyncpg://{TEST_POSTGRES_USER}:{TEST_POSTGRES_PASSWORD}@" \
+                          f"{TEST_POSTGRES_DB}/{TEST_POSTGRES_DB_NAME}"
+
 ALLOW_ORIGINS = os.environ.get("ALLOW_ORIGINS")
 if not ALLOW_ORIGINS:
     raise Exception("ALLOW_ORIGINS must be in .env")
