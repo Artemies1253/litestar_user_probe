@@ -1,5 +1,5 @@
 from advanced_alchemy import service
-from advanced_alchemy.filters import CollectionFilter, ComparisonFilter, SearchFilter, LimitOffset
+from advanced_alchemy.filters import CollectionFilter, ComparisonFilter, SearchFilter, LimitOffset, StatementFilter
 from passlib.context import CryptContext
 from advanced_alchemy.exceptions import DuplicateKeyError, NotFoundError
 from litestar.exceptions import HTTPException
@@ -10,16 +10,16 @@ from users.filters import UserListFilter
 from users.repositories import UserRepositoryService
 
 
-def verify_password(plain_password: str, hashed_password: str) -> str:
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Проверка соответствия пароля и хеша"""
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    return pwd_context.verify(plain_password, hashed_password)
+    return pwd_context.verify(plain_password, hashed_password)  # type: ignore[no-any-return]
 
 
 def get_password_hash(password: str) -> str:
     """Дать захешированную версию пароля"""
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    return pwd_context.hash(password)
+    return pwd_context.hash(password)  # type: ignore[no-any-return]
 
 
 async def create_user(user_service: UserRepositoryService, user_create_data: CreateUser) -> User:
@@ -59,7 +59,7 @@ async def delete_user(user_id: int, user_service: UserRepositoryService) -> None
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="Not found") from ex
 
 
-def get_alchemy_user_list_filters(user_filters: UserListFilter) -> list[LimitOffset, list[SearchFilter]]:
+def get_alchemy_user_list_filters(user_filters: UserListFilter) -> list[LimitOffset, list[StatementFilter]]:
     filters = []
     pagination = LimitOffset(limit=user_filters.limit, offset=user_filters.offset)
     filters.append(pagination)
