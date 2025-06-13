@@ -1,11 +1,3 @@
-import sys
-from pathlib import Path
-import warnings
-
-root_dir = Path(__file__).resolve().parent.parent.parent
-sys.path.append(str(root_dir))
-print(root_dir)
-
 from litestar import Litestar
 from litestar_granian import GranianPlugin
 from litestar.plugins.pydantic import PydanticPlugin
@@ -48,12 +40,10 @@ _test_app = Litestar(
 _test_app.state.session_maker_class = sqlalchemy_config.create_session_maker()
 _test_app.state.session_maker_class_1 = sqlalchemy_config.create_session_maker()
 
-def pytest_configure(config):
-    warnings.filterwarnings("ignore", category=DeprecationWarning, module="pytest_asyncio.plugin")
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
-async def create_test_tables():
+async def session():
     engine = sqlalchemy_config.get_engine()
     async with engine.begin() as conn:
         try:
@@ -61,14 +51,15 @@ async def create_test_tables():
         except OperationalError as exc:
             print(f"Could not create test DB tables: {exc}")
 
-    yield
+    async with sqlalchemy_config.get_session() as session:
+        yield session
 
     async with engine.begin() as conn:
         await conn.run_sync(sqlalchemy_config.metadata.drop_all)
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
-async def admin_user(create_test_tables: None) -> User:
+async def admin_user(session: None) -> User:
     async with sqlalchemy_config.get_session() as session:  # или client.app.state.db
         user = UserModel(
             **test_admin_data
@@ -81,6 +72,6 @@ async def admin_user(create_test_tables: None) -> User:
 
 
 @pytest_asyncio.fixture(scope="session", autouse=True)
-async def auth_header(admin_user: None) -> dict:
+async def auth_header(session: None) -> dict:
     token = jwt_auth.create_token(identifier="1")
     return {"Authorization": f"Bearer {token}"}

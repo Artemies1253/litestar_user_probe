@@ -88,3 +88,6 @@ filterwarnings = "ignore::DeprecationWarning:pytest_asyncio.plugin"
 testpaths = [
     "src/users/tests",
 ]
+pythonpath = [
+  "src"
+]
